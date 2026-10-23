@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>BinaryShop - Panel Vendedor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="ventanaLateral">
+        <aside>
+            <div>
+                <p class="logo"><strong>BinaryShop</strong></p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #c4c7e0;" id="nombre-vendedor-sidebar">Portal Vendedor</p>
+            </div>
+            <nav class="menu">
+                <ul>
+                    <li><button class="boton-menu active" onclick="cambiarVistaVendedor('publicar')">Publicar Producto</button></li>
+                    <li><button class="boton-menu" onclick="cambiarVistaVendedor('misProductos')">Mis Productos</button></li>
+                    <li><button class="boton-menu" onclick="cambiarVistaVendedor('historial')">Historial de Ventas</button></li>
+                </ul>
+            </nav>
+            <footer>
+                <a class="cierreSesion" href="login.html" onclick="localStorage.removeItem('usuarioLogueado')">Cerrar Sesión</a>
+            </footer>
+        </aside>
+        
+        <main>
+            <h1 class="tituloPrincipal" id="titulo-vendedor">Publicar Nuevo Producto</h1>
+            <div id="contenido-vendedor">
+            
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const usuarioLogueado = JSON.parse(localStorage.getItem('usuarioLogueado'));
+        if (!usuarioLogueado || usuarioLogueado.rol !== 'vendedor') {
+            alert("Acceso no autorizado.");
+            window.location.href = "login.html";
+        }
+
+        document.getElementById('nombre-vendedor-sidebar').textContent = `Vendedor: ${usuarioLogueado.nickname}`;
+
+        function cambiarVistaVendedor(vista) {
+            document.querySelectorAll('.boton-menu').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const titulo = document.getElementById('titulo-vendedor');
+            const contenido = document.getElementById('contenido-vendedor');
+
+            let productos = JSON.parse(localStorage.getItem('productos')) || [];
+            let ventas = JSON.parse(localStorage.getItem('ventas')) || [];
+
+            if (vista === 'publicar') {
+                titulo.textContent = "Publicar un Nuevo Artículo";
+                contenido.innerHTML = `
+                    <form id="form-publicar" style="max-width: 400px;">
+                        <input type="text" id="prod-titulo" placeholder="Título del producto" required class="inputreg" style="margin-bottom:15px; display:block;">
+                        <input type="number" id="prod-precio" placeholder="Precio ($)" required class="inputreg" style="margin-bottom:15px; display:block;">
+                        <input type="text" id="prod-imagen" placeholder="URL de la imagen del producto" required class="inputreg" style="margin-bottom:15px; display:block;">
+                        <button type="submit" class="boton boton-primario">Publicar Producto</button>
+                    </form>
+                `;
+
+                document.getElementById('form-publicar').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const nuevoProd = {
+                        titulo: document.getElementById('prod-titulo').value,
+                        precio: document.getElementById('prod-precio').value,
+                        imagen: document.getElementById('prod-imagen').value,
+                        vendedor: usuarioLogueado.nickname
+                    };
+                    productos.push(nuevoProd);
+                    localStorage.setItem('productos', JSON.stringify(productos));
+                    alert("¡Producto publicado con éxito!");
+                    cambiarVistaVendedor('misProductos');
+                });
+
+            } else if (vista === 'misProductos') {
+                titulo.textContent = "Mis Productos Publicados";
+                const misProds = productos.filter(p => p.vendedor === usuarioLogueado.nickname);
+                
+                if (misProds.length === 0) {
+                    contenido.innerHTML = "<p>Aún no has publicado ningún producto.</p>";
+                    return;
+                }
+
+                contenido.innerHTML = `<div class="contenedorProductos">` + misProds.map(p => `
+                    <div>
+                        <div class="producto-imagen"><img src="${p.imagen}" alt="${p.titulo}"></div>
+                        <div class="Productodetalles">
+                            <span class="productoTitulo">${p.titulo}</span>
+                            <span class="productoPrecio">$${p.precio}</span>
+                        </div>
+                    </div>
+                `).join('') + `</div>`;
+
+            } else if (vista === 'historial') {
+                titulo.textContent = "Historial de Ventas";
+                // Filtramos las ventas donde el vendedor coincida
+                const misVentas = ventas.filter(v => v.vendedor === usuarioLogueado.nickname);
+
+                if (misVentas.length === 0) {
+                    contenido.innerHTML = "<p>No registra ventas todavía.</p>";
+                    return;
+                }
+
+                contenido.innerHTML = `<div class="carritoProductos">` + misVentas.map(v => `
+                    <div class="carritoProducto">
+                        <div>
+                            <strong>${v.titulo}</strong> - $${v.precio}<br>
+                            <small>Comprador: ${v.comprador} | Fecha: ${v.fecha}</small>
+                        </div>
+                        <span style="color: green; font-weight: bold;">Completado</span>
+                    </div>
+                `).join('') + `</div>`;
+            }
+        }
+
+        // Cargar vista de publicar
+        window.onload = () => {
+            
+            document.getElementById('contenido-vendedor').innerHTML = `
+                <form id="form-publicar" style="max-width: 400px;">
+                    <input type="text" id="prod-titulo" placeholder="Título del producto" required class="inputreg" style="margin-bottom:15px; display:block;">
+                    <input type="number" id="prod-precio" placeholder="Precio ($)" required class="inputreg" style="margin-bottom:15px; display:block;">
+                    <input type="text" id="prod-imagen" placeholder="URL de la imagen del producto" required class="inputreg" style="margin-bottom:15px; display:block;">
+                    <button type="submit" class="boton boton-primario">Publicar Producto</button>
+                </form>
+            `;
+            document.getElementById('form-publicar').addEventListener('submit', (e) => {
+                e.preventDefault();
+                let productos = JSON.parse(localStorage.getItem('productos')) || [];
+                productos.push({
+                    titulo: document.getElementById('prod-titulo').value,
+                    precio: document.getElementById('prod-precio').value,
+                    imagen: document.getElementById('prod-imagen').value,
+                    vendedor: usuarioLogueado.nickname
+                });
+                localStorage.setItem('productos', JSON.stringify(productos));
+                alert("¡Producto publicado con éxito!");
+                cambiarVistaVendedor('misProductos');
+            });
+        };
+    </script>
+</body>
+</html>

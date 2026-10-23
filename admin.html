@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>BinaryShop - Panel Administrador</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="ventanaLateral">
+        <aside>
+            <div>
+                <p class="logo"><strong>BinaryShop</strong></p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #c4c7e0;">Panel Administrador</p>
+            </div>
+            <nav class="menu">
+                <ul>
+                    <li><button class="boton-menu active" onclick="cambiarVista('solicitudes')">Solicitudes Vendedores</button></li>
+                    <li><button class="boton-menu" onclick="cambiarVista('usuarios')">Gestionar Usuarios</button></li>
+                    <li><button class="boton-menu" onclick="cambiarVista('productos')">Remover Productos</button></li>
+                </ul>
+            </nav>
+            <footer>
+                <a class="cierreSesion" href="login.html" onclick="localStorage.removeItem('usuarioLogueado')">Cerrar Sesión</a>
+            </footer>
+        </aside>
+        
+        <main>
+            <h1 class="tituloPrincipal" id="titulo-admin">Solicitudes de Vendedores</h1>
+            <div id="panel-contenido">
+               
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function cambiarVista(vista) {
+            document.querySelectorAll('.boton-menu').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const titulo = document.getElementById('titulo-admin');
+            const contenido = document.getElementById('panel-contenido');
+            
+            let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+            let productos = JSON.parse(localStorage.getItem('productos')) || [];
+
+            if (vista === 'solicitudes') {
+                titulo.textContent = "Solicitudes de Vendedores Pendientes";
+                const pendientes = usuarios.filter(u => u.rol === 'vendedor' && !u.activo);
+                
+                if (pendientes.length === 0) {
+                    contenido.innerHTML = "<p>No hay solicitudes pendientes en este momento.</p>";
+                    return;
+                }
+                
+                contenido.innerHTML = `<div class="carritoProductos">` + pendientes.map(u => `
+                    <div class="carritoProducto">
+                        <div>
+                            <strong>${u.nombre} ${u.apellido}</strong><br>
+                            <small>Nickname: ${u.nickname} | Dirección: ${u.direccion}</small>
+                        </div>
+                        <button class="productoAgregar" onclick="habilitarVendedor('${u.nickname}')">Habilitar Cuenta</button>
+                    </div>
+                `).join('') + `</div>`;
+
+            } else if (vista === 'usuarios') {
+                titulo.textContent = "Base de Datos - Usuarios Registrados";
+                contenido.innerHTML = `<div class="carritoProductos">` + usuarios.map(u => `
+                    <div class="carritoProducto">
+                        <div>
+                            <strong>${u.nombre} ${u.apellido}</strong> (${u.rol})<br>
+                            <small>Nickname: ${u.nickname}</small>
+                        </div>
+                        ${u.nickname !== 'admin' ? `<button class="carritoProductoEliminar" onclick="eliminarUsuario('${u.nickname}')" style="background: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Eliminar</button>` : '<span>Protegido</span>'}
+                    </div>
+                `).join('') + `</div>`;
+
+            } else if (vista === 'productos') {
+                titulo.textContent = "Catálogo Global - Remover Productos";
+                if (productos.length === 0) {
+                    contenido.innerHTML = "<p>No hay productos publicados.</p>";
+                    return;
+                }
+                contenido.innerHTML = `<div class="contenedorProductos">` + productos.map((p, index) => `
+                    <div>
+                        <div class="producto-imagen"><img src="${p.imagen || 'https://via.placeholder.com/150'}" alt="${p.titulo}"></div>
+                        <div class="Productodetalles">
+                            <span class="productoTitulo">${p.titulo}</span>
+                            <span class="productoPrecio">$${p.precio}</span>
+                            <small>Vendedor: ${p.vendedor}</small>
+                            <button class="productoAgregar" onclick="removerProducto(${index})">Eliminar Producto</button>
+                        </div>
+                    </div>
+                `).join('') + `</div>`;
+            }
+        }
+
+        function habilitarVendedor(nickname) {
+            let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+            usuarios = usuarios.map(u => u.nickname === nickname ? {...u, activo: true} : u);
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            alert("¡Vendedor habilitado con éxito!");
+            cambiarVista('solicitudes');
+        }
+
+        function eliminarUsuario(nickname) {
+            if (confirm("¿Estás seguro de eliminar este usuario de la base de datos?")) {
+                let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+                usuarios = usuarios.filter(u => u.nickname !== nickname);
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                cambiarVista('usuarios');
+            }
+        }
+
+        function removerProducto(index) {
+            if (confirm("¿Deseas remover este producto?")) {
+                let productos = JSON.parse(localStorage.getItem('productos')) || [];
+                productos.splice(index, 1);
+                localStorage.setItem('productos', JSON.stringify(productos));
+                cambiarVista('productos');
+            }
+        }
+
+        // Cargar vista por defecto 
+        window.onload = () => cambiarVista('solicitudes');
+    </script>
+</body>
+</html>

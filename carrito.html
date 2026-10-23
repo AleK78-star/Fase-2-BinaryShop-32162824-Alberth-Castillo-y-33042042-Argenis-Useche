@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BinaryShop - Bienvenida</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="ventanaLateral">
+    <aside>
+        <header>
+            <hi class=logo>BinaryShop</hi>
+        </header>
+        <nav>
+            <ul class="menu">
+                <li>
+                    <a class="botonVolver boton-menu " href="catalogo.html">Seguir Comprando</a></li>
+
+                <li><a class="boton-menu botonCarrito active" href="carrito.html">Carrito</a></li>
+            
+            </ul>
+        </nav>
+    </aside>
+    <main>
+        <h2 class ="tituloPrincipal">Carrito</h2>
+        <div class="contenedorCarrito">
+            <p id="carrito-vacio" class="carritoVacio">Tu carrito esta vacio</p>
+                    <div id="carrito-productos" class="carritoProductos disabled"></div>
+
+
+                    <div id="carrito-acciones" class="carritoAcciones disabled">
+
+                        <div class="carritoAccionesIzq">
+                         <button id="carritoAccionesVaciar" class="carritoAccionesVaciar">Vaciar Carrito</button></div>
+                        <div class="carritoAccionesDer">
+                                <div class="carritoAccionesTotal">
+                                <p>Total:</p>
+                             <p Id="total">3000bs</p>
+                                </div>
+                            <button id="carritoAccionesComprar" class="carritoAccionesComprar">Comprar Ahora</button>
+                        </div>
+                    </div>
+
+            <p id="carrito-comprado" class="carritoComprado disabled">Muchas gracias por tu compra</p>
+        </div>
+
+        <script src="carrito.js"></script>
+    </main>\
+
+</div>
+</body>
+</html>

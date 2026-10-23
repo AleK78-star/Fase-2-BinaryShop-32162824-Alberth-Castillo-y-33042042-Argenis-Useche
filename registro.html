@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BinaryShop - Registro</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="contenedor-autentificacion">
+        <h2>Registro de Usuario</h2>
+        <form id="form-registro">
+            <input type="text" id="reg-nombre" placeholder="Introduce Nombre" required class="inputreg">
+            <input type="text" id="reg-apellido" placeholder="Introduce Apellido" required class="inputreg">
+            <input type="text" id="reg-direccion" placeholder="Introduce Direccion" required class="inputreg">
+            <input type="text" id="reg-nickname" placeholder="Introduce Nickname Unico" required class="inputreg">
+            <input type="text" id="reg-contraseña" placeholder="Introduce Contraseña" required class="inputreg">
+            <label>Seleccionar Rol:</label>
+            <select class="selectreg" id="reg-rol">
+                <option value="comprador">Comprador</option>
+                <option value="vendedor">Vendedor</option>
+            </select>
+            <button type="submit" class="boton boton secundario">Registrar Cuenta</button>
+        </form>
+
+        <p class="texto-enlace"> Ya tienes cuenta? <a href="login.html">Inicia sesion</a></p>
+        <p class="texto-enlace"><a href="index.html">Volver al inicio</a></p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
